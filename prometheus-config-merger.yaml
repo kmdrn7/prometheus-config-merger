@@ -1,0 +1,16 @@
+# path to render final prometheus config file
+target_prometheus_config: example/prometheus.yaml
+
+# define multiple prometheus config sources
+# prometheus config with weight=1 will be used as base prometheus config file
+prometheus_configs:
+  - id: baseconfig
+    path: example/prometheus_current.yaml
+    weight: 1
+  - id: operatorconfig
+    path: example/prometheus_operator.yaml
+    weight: 2
+  # add as many prometheus config as you like
+  # - id: anotherconfig
+  #   path: example/another_prometheus.yaml
+  #   weight: 3
