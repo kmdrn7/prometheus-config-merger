@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"prometheus-config-merger/cmd/merge"
+	"prometheus-config-merger/cmd/server"
 	"prometheus-config-merger/pkg/config"
 
 	"github.com/spf13/cobra"
@@ -39,7 +40,11 @@ func Execute() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
+	// add merge subcommand
 	rootCmd.AddCommand(merge.MergeCmd)
+
+	// add server subcommand
+	rootCmd.AddCommand(server.ServerCmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
