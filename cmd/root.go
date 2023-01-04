@@ -8,6 +8,7 @@ import (
 	"prometheus-config-merger/cmd/merge"
 	"prometheus-config-merger/cmd/server"
 	"prometheus-config-merger/pkg/config"
+	"prometheus-config-merger/pkg/http"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -39,6 +40,7 @@ func Execute() {
 
 func init() {
 	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(http.New)
 
 	// add merge subcommand
 	rootCmd.AddCommand(merge.MergeCmd)

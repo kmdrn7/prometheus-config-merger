@@ -14,3 +14,6 @@ prometheus_configs:
   # - id: anotherconfig
   #   path: example/another_prometheus.yaml
   #   weight: 3
+
+# define where prometheus-server endpoint is
+prometheus_endpoint: http://127.0.0.1:9090
