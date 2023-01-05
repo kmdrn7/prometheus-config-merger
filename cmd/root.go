@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -14,7 +13,10 @@ import (
 	"github.com/spf13/viper"
 )
 
-var cfgFile string
+var (
+	cfgFile string
+	debug   bool
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -52,7 +54,8 @@ func init() {
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is ./prometheus-config-merger.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "Config file (default is ./prometheus-config-merger.yaml)")
+	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, "Enable debug log message")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -69,9 +72,13 @@ func initConfig() {
 
 	viper.AutomaticEnv() // read in environment variables that match
 
+	// override configuration through viper
+	viper.Set("debug", debug)
+	log.Println("running in DEBUG mode")
+
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
-		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())
+		log.Println("using config file:", viper.ConfigFileUsed())
 
 		pcmConf := &config.Config{}
 		if err := viper.Unmarshal(pcmConf); err != nil {

@@ -16,6 +16,7 @@ type Config struct {
 	PrometheusEndpoint     string             `mapstructure:"prometheus_endpoint"`
 	PrometheusConfigs      []PrometheusConfig `mapstructure:"prometheus_configs"`
 	TargetPrometheusConfig string             `mapstructure:"target_prometheus_config"`
+	Debug                  bool
 }
 
 func GetConfig() *Config {
