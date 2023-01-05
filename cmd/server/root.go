@@ -31,7 +31,7 @@ var ServerCmd = &cobra.Command{
 		})
 
 		// add middleware to log requests
-		app.Use(logger.New())
+		app.Use(logger.New(logger.ConfigDefault))
 
 		// implement readiness/healthcheck
 		app.Get("/healthz", func(c *fiber.Ctx) error {
