@@ -28,6 +28,13 @@ func Run() {
 		localPromeConfig := &prometheusconfig.Config{}
 		yfile, err := os.ReadFile(promeConfig.Path)
 		if err != nil {
+			// ignore error for n+1 config file
+			// send warning message for checking the correct prometheus config path
+			if os.IsNotExist(err) && idx > 0 {
+				log.Println("file", promeConfig.Path, "is not exist yet, skipping")
+				log.Println("please make sure prometheus config path is correct!!!")
+				continue
+			}
 			log.Fatal(err.Error())
 		}
 		if err := yaml.Unmarshal(yfile, &localPromeConfig); err != nil {
