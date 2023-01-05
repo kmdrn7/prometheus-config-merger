@@ -44,7 +44,11 @@ var ServerCmd = &cobra.Command{
 			merge.Run()
 
 			log.Println("trigger reload on prometheus-server")
-			http.Post(reloadUrl)
+			if r, err := http.Post(reloadUrl); err != nil {
+				log.Panic(err.Error())
+			} else {
+				log.Println(r.StatusCode())
+			}
 
 			return c.SendStatus(200)
 		})

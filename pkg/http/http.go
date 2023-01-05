@@ -19,8 +19,12 @@ func New() {
 }
 
 // Send http post request to specified url
-func Post(url string) {
-	httpClient.R().Post(url)
+func Post(url string) (*resty.Response, error) {
+	r, err := httpClient.R().Post(url)
+	if err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 // Send http get request to specified url
