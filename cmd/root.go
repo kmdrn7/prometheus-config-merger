@@ -74,7 +74,9 @@ func initConfig() {
 
 	// override configuration through viper
 	viper.Set("debug", debug)
-	log.Println("running in DEBUG mode")
+	if debug {
+		log.Println("running in DEBUG mode")
+	}
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
