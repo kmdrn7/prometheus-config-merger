@@ -7,12 +7,15 @@ import (
 	"prometheus-config-merger/pkg/utils"
 	"sort"
 
+	gokitlog "github.com/go-kit/log"
 	prometheusconfig "github.com/prometheus/prometheus/config"
+	_ "github.com/prometheus/prometheus/discovery/install"
 	"github.com/spf13/viper"
-	"gopkg.in/yaml.v3"
 )
 
 func Run() {
+	logger := gokitlog.NewNopLogger()
+
 	cfg := &config.Config{}
 	if err := viper.Unmarshal(cfg); err != nil {
 		log.Fatal(err.Error())
@@ -25,8 +28,7 @@ func Run() {
 	finalPromeConfig := &prometheusconfig.Config{}
 
 	for idx, promeConfig := range cfg.PrometheusConfigs {
-		localPromeConfig := &prometheusconfig.Config{}
-		yfile, err := os.ReadFile(promeConfig.Path)
+		localPromeConfig, err := prometheusconfig.LoadFile(promeConfig.Path, false, false, logger)
 		if err != nil {
 			// ignore error for n+1 config file
 			// send warning message for checking the correct prometheus config path
@@ -35,9 +37,6 @@ func Run() {
 				log.Println("please make sure prometheus config path is correct!!!")
 				continue
 			}
-			log.Fatal(err.Error())
-		}
-		if err := yaml.Unmarshal(yfile, &localPromeConfig); err != nil {
 			log.Fatal(err.Error())
 		}
 
