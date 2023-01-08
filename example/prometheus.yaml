@@ -44,6 +44,11 @@ alerting:
           regex: "9093"
           replacement: $1
           action: keep
+      kubernetes_sd_configs:
+        - role: pod
+          kubeconfig_file: ""
+          follow_redirects: true
+          enable_http2: true
 rule_files:
   - /etc/config/recording_rules.yml
   - /etc/config/alerting_rules.yml
@@ -126,6 +131,11 @@ scrape_configs:
         target_label: node
         replacement: $1
         action: replace
+    kubernetes_sd_configs:
+      - role: endpoints
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
   - job_name: kubernetes-service-endpoints-slow
     honor_labels: true
     honor_timestamps: true
@@ -185,6 +195,11 @@ scrape_configs:
         target_label: node
         replacement: $1
         action: replace
+    kubernetes_sd_configs:
+      - role: endpoints
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
   - job_name: prometheus-pushgateway
     honor_labels: true
     honor_timestamps: true
@@ -200,6 +215,11 @@ scrape_configs:
         regex: pushgateway
         replacement: $1
         action: keep
+    kubernetes_sd_configs:
+      - role: service
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
   - job_name: kubernetes-services
     honor_labels: true
     honor_timestamps: true
@@ -251,6 +271,11 @@ scrape_configs:
         target_label: service
         replacement: $1
         action: replace
+    kubernetes_sd_configs:
+      - role: service
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
   - job_name: kubernetes-pods
     honor_labels: true
     honor_timestamps: true
@@ -314,6 +339,11 @@ scrape_configs:
         regex: Pending|Succeeded|Failed|Completed
         replacement: $1
         action: drop
+    kubernetes_sd_configs:
+      - role: pod
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
   - job_name: kubernetes-pods-slow
     honor_labels: true
     honor_timestamps: true
@@ -372,6 +402,11 @@ scrape_configs:
         regex: Pending|Succeeded|Failed|Completed
         replacement: $1
         action: drop
+    kubernetes_sd_configs:
+      - role: pod
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
   - job_name: serviceMonitor/default/fluentd/0
     honor_timestamps: true
     scrape_interval: 30s
@@ -466,6 +501,15 @@ scrape_configs:
         regex: $(SHARD)
         replacement: $1
         action: keep
+    kubernetes_sd_configs:
+      - role: endpoints
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
+        namespaces:
+          own_namespace: false
+          names:
+            - default
   - job_name: serviceMonitor/monitoring/prometheus-k8s/0
     honor_timestamps: true
     scrape_interval: 30s
@@ -570,6 +614,15 @@ scrape_configs:
         regex: $(SHARD)
         replacement: $1
         action: keep
+    kubernetes_sd_configs:
+      - role: endpoints
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
+        namespaces:
+          own_namespace: false
+          names:
+            - monitoring
   - job_name: serviceMonitor/monitoring/prometheus-k8s/1
     honor_timestamps: true
     scrape_interval: 30s
@@ -674,6 +727,15 @@ scrape_configs:
         regex: $(SHARD)
         replacement: $1
         action: keep
+    kubernetes_sd_configs:
+      - role: endpoints
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
+        namespaces:
+          own_namespace: false
+          names:
+            - monitoring
   - job_name: serviceMonitor/monitoring/prometheus-operator/0
     honor_labels: true
     honor_timestamps: true
@@ -784,3 +846,12 @@ scrape_configs:
         regex: $(SHARD)
         replacement: $1
         action: keep
+    kubernetes_sd_configs:
+      - role: endpoints
+        kubeconfig_file: ""
+        follow_redirects: true
+        enable_http2: true
+        namespaces:
+          own_namespace: false
+          names:
+            - monitoring
