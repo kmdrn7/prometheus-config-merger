@@ -1,6 +1,19 @@
 # Prometheus Config Merger
 
-Prometheus Config Merger is a utility that allows you to merge multiple Prometheus configuration files into one and write it to a designated location. It also provides a way to automatically notify Prometheus-Server of any changes in the configuration file. This utility can be used in combination with Prometheus-Operator to segregate Prometheus-related configurations without needing to migrate your current monitoring stack to use Prometheus-Server by Prometheus-Operator.
+Prometheus Config Merger is a utility that allows you to merge multiple Prometheus configuration files into one and write it to a designated location. This tool allows you to specify a directory where you want to read the configuration files from and an output file where you want to write the merged configuration. It also supports the ability to notify a Prometheus-Server of config file changes.
+
+It also provides a way to automatically notify Prometheus-Server of any changes in the configuration file. This utility can be used in combination with Prometheus-Operator to segregate Prometheus related configurations without needing to migrate your current monitoring stack to use Prometheus-Server provided by Prometheus-Operator.
+
+## Features
+
+* Merge multiple Prometheus configuration files into a single configuration file.
+* Watch for changes in the specified configuration directory and automatically merge new or updated files.
+* Notify a Prometheus-Server of config file changes.
+* Support for reading and rendering Prometheus configuration files, including extracting config files from .gz files or expanding environment variables inside config files.
+
+## Why use Prometheus Config Merger?
+
+Prometheus Config Merger is useful in situations where you have multiple teams or services that manage their own Prometheus configurations, but you want to have a single configuration file for your entire Prometheus setup. This allows you to have a centralized configuration management and avoid having to manually merge configuration files each time they are updated.
 
 Let's say we have 2 Prometheus configuration files
 
@@ -90,6 +103,14 @@ I want to merge the Prometheus-Operator config file with my current Prometheus-S
 
 **(prometheus-server deployed on kubernetes)*
 
+## Troubleshooting
+
+If you encounter any issues when using Prometheus Config Merger, please check the following:
+* Verify that the specified configuration directory exists and contains valid Prometheus configuration files.
+* Ensure that the specified output file has the correct permissions for writing.
+* Make sure that the specified reload URL is correct and that the Prometheus-Server is running and reachable.
+* If you are running Prometheus Config Merger in a container, ensure that it has the necessary permissions to access the specified configuration directory and output file.
+
 ## Contributions
 We welcome contributions to the Prometheus Config Merger, please follow the guidelines for submitting pull requests and reporting bugs.
 
@@ -98,5 +119,10 @@ Prometheus Config Merger is open-sourced software licensed under the MIT license
 
 ## Additional notes
 Feel free to open an issue if you have any questions or problems.
+
+## Additional resources
+* [Prometheus documentation](https://prometheus.io/docs/introduction/overview)
+* [Prometheus Configuration documentation](https://prometheus.io/docs/prometheus/latest/configuration/configuration/)
+* [Prometheus Operator documentation](https://github.com/prometheus-operator/prometheus-operator)
 
 The code was originally forked from https://github.com/coreos/prometheus-config-reloader and adapted to merge multiple config files.
