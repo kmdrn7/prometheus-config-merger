@@ -10,6 +10,7 @@ It also provides a way to automatically notify Prometheus-Server of any changes 
 * Watch for changes in the specified configuration directory and automatically merge new or updated files.
 * Notify a Prometheus-Server of config file changes.
 * Support for reading and rendering Prometheus configuration files, including extracting config files from .gz files or expanding environment variables inside config files.
+* Only support limited SD config by default (file, kubernetes, gce). You can enable additions SD config by installing it inside [pkg/merge/merge.go](pkg/merge/merge.go)
 
 ## Why use Prometheus Config Merger?
 

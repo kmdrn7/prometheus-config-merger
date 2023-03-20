@@ -9,7 +9,11 @@ import (
 
 	gokitlog "github.com/go-kit/log"
 	prometheusconfig "github.com/prometheus/prometheus/config"
-	_ "github.com/prometheus/prometheus/discovery/install"
+
+	// install custom prometheus service discovery
+	_ "github.com/prometheus/prometheus/discovery/file"
+	_ "github.com/prometheus/prometheus/discovery/gce"
+	_ "github.com/prometheus/prometheus/discovery/kubernetes"
 )
 
 func Run() {
