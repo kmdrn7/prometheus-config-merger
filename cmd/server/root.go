@@ -1,20 +1,13 @@
 package server
 
 import (
-	"log"
-	"prometheus-config-merger/pkg/config"
-	"prometheus-config-merger/pkg/http"
-	"prometheus-config-merger/pkg/merge"
+	"prometheus-config-merger/pkg/server"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/spf13/cobra"
 )
 
 var (
-	listenAddress    string
-	reloadUrl        string
-	configOutputFile string
+	serverImpl *server.Server = server.NewServer()
 )
 
 // Cmd represents the base command when called without any subcommands
@@ -23,44 +16,12 @@ var Cmd = &cobra.Command{
 	Short: "Merge multiple prometheus config files into single config file.",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		cfg := config.GetConfig()
-		log.Println("using prometheus server at", cfg.PrometheusEndpoint)
-
-		app := fiber.New(fiber.Config{
-			DisableStartupMessage: true,
-		})
-
-		// add middleware to log requests
-		app.Use(logger.New(logger.ConfigDefault))
-
-		// implement readiness/healthcheck
-		app.Get("/healthz", func(c *fiber.Ctx) error {
-			return c.SendStatus(200)
-		})
-
-		// forward reload request from sidecar to prometheus-server
-		app.Post("/-/reload", func(c *fiber.Ctx) error {
-			log.Println("merging prometheus config files")
-			merge.Run()
-
-			log.Println("trigger reload on prometheus-server")
-			if r, err := http.Post(reloadUrl); err != nil {
-				log.Panic(err.Error())
-			} else {
-				log.Println(r.StatusCode())
-			}
-
-			return c.SendStatus(200)
-		})
-
-		log.Println("starting webserver on", listenAddress)
-		log.Fatal(app.Listen(listenAddress))
+		cobra.CheckErr(serverImpl.Start())
 	},
 }
 
 func init() {
-	Cmd.Flags().StringVar(&listenAddress, "web.listen-address", ":5000", "Address on which the webserver service listens")
-	Cmd.Flags().StringVar(&reloadUrl, "reload-url", "http://localhost:9090/-/reload", "reload URL to trigger Prometheus reload on")
-	Cmd.Flags().StringVar(&configOutputFile, "config-output-file", "/etc/prometheus/prometheus_merged.yaml", "output file from multiple config files merged")
+	Cmd.Flags().StringVar(&serverImpl.ListenAddress, "web.listen-address", ":5000", "Address on which the webserver service listens")
+	Cmd.Flags().StringVar(&serverImpl.ReloadUrl, "reload-url", "http://localhost:9090/-/reload", "reload URL to trigger Prometheus reload on")
+	Cmd.Flags().StringVar(&serverImpl.ConfigOutputFile, "config-output-file", "/etc/prometheus/prometheus_merged.yaml", "output file from multiple config files merged")
 }
