@@ -6,8 +6,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
-var MergeCmd = &cobra.Command{
+// Cmd represents the base command when called without any subcommands
+var Cmd = &cobra.Command{
 	Use:   "merge",
 	Short: "Merge multiple prometheus config files into single config file.",
 	Long: `

@@ -6,6 +6,7 @@ import (
 
 	"prometheus-config-merger/cmd/merge"
 	"prometheus-config-merger/cmd/server"
+	"prometheus-config-merger/cmd/watcher"
 	"prometheus-config-merger/pkg/config"
 	"prometheus-config-merger/pkg/http"
 
@@ -45,10 +46,13 @@ func init() {
 	cobra.OnInitialize(http.New)
 
 	// add merge subcommand
-	rootCmd.AddCommand(merge.MergeCmd)
+	rootCmd.AddCommand(merge.Cmd)
 
 	// add server subcommand
-	rootCmd.AddCommand(server.ServerCmd)
+	rootCmd.AddCommand(server.Cmd)
+
+	// add watcher subdommand
+	rootCmd.AddCommand(watcher.Cmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
@@ -79,11 +83,12 @@ func initConfig() {
 	}
 
 	// If a config file is found, read it in.
+	// Run configuration checking
 	if err := viper.ReadInConfig(); err == nil {
 		log.Println("using config file:", viper.ConfigFileUsed())
 
-		pcmConf := &config.Config{}
-		if err := viper.Unmarshal(pcmConf); err != nil {
+		pcmConf := config.New()
+		if err := pcmConf.Validate(); err != nil {
 			log.Fatal(err.Error())
 		}
 	}

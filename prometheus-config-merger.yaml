@@ -10,10 +10,30 @@ prometheus_configs:
   - id: operatorconfig
     path: example/prometheus_operator.yaml
     weight: 2
-  # add as many prometheus config as you like
+  - id: fetchfromkubernetes1
+    kubernetes:
+      secret:
+        name: prometheus-squad-a
+        key: prometheus.yaml
+        namespace: default
+    path: example/fetchfromkubernetes_1.yaml
+    weight: 3
+  - id: fetchfromkubernetes2
+    kubernetes:
+      configmap:
+        name: k8s-prometheus-operator
+        key: prometheus.yaml
+        namespace: default
+    path: example/fetchfromkubernetes_2.yaml
+    weight: 4
+  # add as many prometheus config as you like. example:
   # - id: anotherconfig
   #   path: example/another_prometheus.yaml
   #   weight: 3
 
 # define where prometheus-server endpoint is
 prometheus_endpoint: http://127.0.0.1:9090
+
+# define kubernetes specific configuration
+kubernetes:
+  incluster: true

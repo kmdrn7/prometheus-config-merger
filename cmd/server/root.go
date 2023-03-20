@@ -17,7 +17,8 @@ var (
 	configOutputFile string
 )
 
-var ServerCmd = &cobra.Command{
+// Cmd represents the base command when called without any subcommands
+var Cmd = &cobra.Command{
 	Use:   "server",
 	Short: "Merge multiple prometheus config files into single config file.",
 	Long:  ``,
@@ -59,7 +60,7 @@ var ServerCmd = &cobra.Command{
 }
 
 func init() {
-	ServerCmd.Flags().StringVar(&listenAddress, "web.listen-address", ":5000", "Address on which the webserver service listens")
-	ServerCmd.Flags().StringVar(&reloadUrl, "reload-url", "http://localhost:9090/-/reload", "reload URL to trigger Prometheus reload on")
-	ServerCmd.Flags().StringVar(&configOutputFile, "config-output-file", "/etc/prometheus/prometheus_merged.yaml", "output file from multiple config files merged")
+	Cmd.Flags().StringVar(&listenAddress, "web.listen-address", ":5000", "Address on which the webserver service listens")
+	Cmd.Flags().StringVar(&reloadUrl, "reload-url", "http://localhost:9090/-/reload", "reload URL to trigger Prometheus reload on")
+	Cmd.Flags().StringVar(&configOutputFile, "config-output-file", "/etc/prometheus/prometheus_merged.yaml", "output file from multiple config files merged")
 }

@@ -10,16 +10,12 @@ import (
 	gokitlog "github.com/go-kit/log"
 	prometheusconfig "github.com/prometheus/prometheus/config"
 	_ "github.com/prometheus/prometheus/discovery/install"
-	"github.com/spf13/viper"
 )
 
 func Run() {
 	logger := gokitlog.NewNopLogger()
 
-	cfg := &config.Config{}
-	if err := viper.Unmarshal(cfg); err != nil {
-		log.Fatal(err.Error())
-	}
+	cfg := config.GetConfig()
 
 	sort.Slice(cfg.PrometheusConfigs, func(i, j int) bool {
 		return cfg.PrometheusConfigs[i].Weight < cfg.PrometheusConfigs[j].Weight
