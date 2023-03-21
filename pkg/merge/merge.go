@@ -6,6 +6,7 @@ import (
 	"prometheus-config-merger/pkg/config"
 	"prometheus-config-merger/pkg/utils"
 	"sort"
+	"sync"
 
 	gokitlog "github.com/go-kit/log"
 	prometheusconfig "github.com/prometheus/prometheus/config"
@@ -16,10 +17,10 @@ import (
 	_ "github.com/prometheus/prometheus/discovery/kubernetes"
 )
 
-func Run() {
+func Run(cfg *config.Config) {
 	logger := gokitlog.NewNopLogger()
 
-	cfg := config.GetConfig()
+	m := &sync.Mutex{}
 
 	sort.Slice(cfg.PrometheusConfigs, func(i, j int) bool {
 		return cfg.PrometheusConfigs[i].Weight < cfg.PrometheusConfigs[j].Weight
@@ -53,13 +54,22 @@ func Run() {
 		log.Fatal(err.Error())
 	}
 
+	WriteToFileSafe(cfg.TargetPrometheusConfig, b.Bytes(), m)
+}
+
+// WriteToFileSafe write content to filepath safely using golang mutex
+func WriteToFileSafe(filepath string, content []byte, m *sync.Mutex) {
+	// acquire mutex lock
+	m.Lock()
 	// open target file and rewrite the content
-	f, err := os.Create(cfg.TargetPrometheusConfig)
+	f, err := os.Create(filepath)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	defer f.Close()
-	if _, err := f.Write(b.Bytes()); err != nil {
+	if _, err := f.Write(content); err != nil {
 		log.Fatal(err.Error())
 	}
+	// release mutex lock
+	m.Unlock()
 }
