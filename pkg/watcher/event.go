@@ -66,7 +66,7 @@ func configmapOnUpdate(oldObj interface{}, newObj interface{}) {
 }
 
 func configmapOnDelete(obj interface{}) {
-	configmap := obj.(*corev1.Secret)
+	configmap := obj.(*corev1.ConfigMap)
 	log.Printf("event [configmapOnDelete] triggered for [%s/%s] \n", configmap.Namespace, configmap.Name)
 }
 
