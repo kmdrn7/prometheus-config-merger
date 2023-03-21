@@ -28,6 +28,7 @@ func NewServer() *Server {
 }
 
 func (s *Server) Start() error {
+
 	cfg := config.GetConfig()
 	log.Println("using prometheus server at", cfg.PrometheusEndpoint)
 

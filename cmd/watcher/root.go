@@ -25,7 +25,7 @@ whether in plain text format or in gzipped format, then it will map and sync wit
 		if dryRun {
 			cobra.CheckErr(w.DryRun())
 		} else {
-			cobra.CheckErr(w.Run())
+			cobra.CheckErr(w.Start())
 		}
 	},
 }

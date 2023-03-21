@@ -34,7 +34,7 @@ func secretOnAdd(obj interface{}) {
 		panic(err)
 	}
 	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
-		panic(err)
+		log.Println("ERROR:", err.Error())
 	}
 
 	// release mutex lock
@@ -62,7 +62,7 @@ func secretOnUpdate(oldObj interface{}, newObj interface{}) {
 		panic(err)
 	}
 	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
-		panic(err)
+		log.Println("ERROR:", err.Error())
 	}
 
 	// release mutex lock
@@ -95,7 +95,7 @@ func configmapOnAdd(obj interface{}) {
 		panic(err)
 	}
 	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
-		panic(err)
+		log.Println("ERROR:", err.Error())
 	}
 
 	// release mutex lock
@@ -123,7 +123,7 @@ func configmapOnUpdate(oldObj interface{}, newObj interface{}) {
 		panic(err)
 	}
 	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
-		panic(err)
+		log.Println("ERROR:", err.Error())
 	}
 
 	// release mutex lock

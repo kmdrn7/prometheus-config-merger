@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"prometheus-config-merger/cmd/merge"
+	"prometheus-config-merger/cmd/serveandmerge"
 	"prometheus-config-merger/cmd/server"
 	"prometheus-config-merger/cmd/watcher"
 	"prometheus-config-merger/pkg/config"
@@ -53,6 +54,9 @@ func init() {
 
 	// add watcher subdommand
 	rootCmd.AddCommand(watcher.Cmd)
+
+	// add serveandmerge subdommand
+	rootCmd.AddCommand(serveandmerge.Cmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,

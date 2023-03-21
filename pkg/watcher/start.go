@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func (w *Watcher) Run() error {
+func (w *Watcher) Start() error {
 	w.setupConfig()
 	w.setupWatchedResources()
 	w.setupKubernetesClientset()

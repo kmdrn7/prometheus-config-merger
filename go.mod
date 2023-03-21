@@ -6,6 +6,7 @@ require (
 	github.com/go-kit/log v0.2.1
 	github.com/go-resty/resty/v2 v2.1.1-0.20191201195748-d7b97669fe48
 	github.com/gofiber/fiber/v2 v2.40.1
+	github.com/oklog/run v1.1.0
 	github.com/prometheus/prometheus v0.41.0
 	github.com/spf13/cobra v1.6.1
 	github.com/spf13/viper v1.14.0
