@@ -2,10 +2,13 @@ package watcher
 
 import (
 	"prometheus-config-merger/pkg/config"
+	"sync"
 
 	"golang.org/x/net/context"
 	"k8s.io/client-go/kubernetes"
 )
+
+var M *sync.Mutex = &sync.Mutex{}
 
 type Watcher struct {
 	incluster  bool

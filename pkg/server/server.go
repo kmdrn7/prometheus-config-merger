@@ -47,7 +47,7 @@ func (s *Server) Start() error {
 	// forward reload request from sidecar to prometheus-server
 	app.Post("/-/reload", func(c *fiber.Ctx) error {
 		log.Println("merging prometheus config files")
-		merge.Run()
+		merge.Run(cfg)
 
 		log.Println("trigger reload on prometheus-server")
 		if r, err := http.Post(s.ReloadUrl); err != nil {

@@ -9,6 +9,9 @@ import (
 )
 
 func secretOnAdd(obj interface{}) {
+	// acquire mutex lock
+	M.Lock()
+
 	secret := obj.(*corev1.Secret)
 	wr, err := getWatchedResourceMapping("Secret", secret.Name, secret.Namespace)
 	if err != nil {
@@ -19,9 +22,15 @@ func secretOnAdd(obj interface{}) {
 	if err := syncResourceContentToLocalFile(secret.Data[wr.Key], wr.Path); err != nil {
 		panic(err)
 	}
+
+	// release mutex lock
+	M.Unlock()
 }
 
 func secretOnUpdate(oldObj interface{}, newObj interface{}) {
+	// acquire mutex lock
+	M.Lock()
+
 	secret := newObj.(*corev1.Secret)
 	wr, err := getWatchedResourceMapping("Secret", secret.Name, secret.Namespace)
 	if err != nil {
@@ -32,6 +41,9 @@ func secretOnUpdate(oldObj interface{}, newObj interface{}) {
 	if err := syncResourceContentToLocalFile(secret.Data[wr.Key], wr.Path); err != nil {
 		panic(err)
 	}
+
+	// release mutex lock
+	M.Unlock()
 }
 
 func secretOnDelete(obj interface{}) {
@@ -40,6 +52,9 @@ func secretOnDelete(obj interface{}) {
 }
 
 func configmapOnAdd(obj interface{}) {
+	// acquire mutex lock
+	M.Lock()
+
 	configmap := obj.(*corev1.ConfigMap)
 	wr, err := getWatchedResourceMapping("ConfigMap", configmap.Name, configmap.Namespace)
 	if err != nil {
@@ -50,9 +65,15 @@ func configmapOnAdd(obj interface{}) {
 	if err := syncResourceContentToLocalFile([]byte(configmap.Data[wr.Key]), wr.Path); err != nil {
 		panic(err)
 	}
+
+	// release mutex lock
+	M.Unlock()
 }
 
 func configmapOnUpdate(oldObj interface{}, newObj interface{}) {
+	// acquire mutex lock
+	M.Lock()
+
 	configmap := newObj.(*corev1.ConfigMap)
 	wr, err := getWatchedResourceMapping("ConfigMap", configmap.Name, configmap.Namespace)
 	if err != nil {
@@ -63,6 +84,9 @@ func configmapOnUpdate(oldObj interface{}, newObj interface{}) {
 	if err := syncResourceContentToLocalFile([]byte(configmap.Data[wr.Key]), wr.Path); err != nil {
 		panic(err)
 	}
+
+	// release mutex lock
+	M.Unlock()
 }
 
 func configmapOnDelete(obj interface{}) {
