@@ -88,7 +88,7 @@ func TestMerge_Run(t *testing.T) {
 		go func(tt field) {
 			cfg.PrometheusConfigs = tt.promeconfigs
 			t.Run(tt.testname, func(t *testing.T) {
-				Run(cfg)
+				RunWithReturn(cfg)
 			})
 			wg.Done()
 		}(tt)

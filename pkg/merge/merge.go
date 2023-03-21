@@ -17,10 +17,25 @@ import (
 	_ "github.com/prometheus/prometheus/discovery/kubernetes"
 )
 
-func Run(cfg *config.Config) {
-	logger := gokitlog.NewNopLogger()
+func RunWithReturn(cfg *config.Config) ([]byte, error) {
+	content, err := run(cfg)
+	if err != nil {
+		panic(err)
+	}
+	return content, nil
+}
 
+func RunWithoutReturn(cfg *config.Config) {
 	m := &sync.Mutex{}
+	content, err := run(cfg)
+	if err != nil {
+		panic(err)
+	}
+	WriteToFileSafe(cfg.TargetPrometheusConfig, content, m)
+}
+
+func run(cfg *config.Config) ([]byte, error) {
+	logger := gokitlog.NewNopLogger()
 
 	sort.Slice(cfg.PrometheusConfigs, func(i, j int) bool {
 		return cfg.PrometheusConfigs[i].Weight < cfg.PrometheusConfigs[j].Weight
@@ -38,7 +53,7 @@ func Run(cfg *config.Config) {
 				log.Println("please make sure prometheus config path is correct!!!")
 				continue
 			}
-			log.Fatal(err.Error())
+			return []byte(""), err
 		}
 
 		if idx == 0 {
@@ -51,10 +66,10 @@ func Run(cfg *config.Config) {
 
 	b, err := utils.YamlEncode(&finalPromeConfig)
 	if err != nil {
-		log.Fatal(err.Error())
+		return []byte(""), err
 	}
 
-	WriteToFileSafe(cfg.TargetPrometheusConfig, b.Bytes(), m)
+	return b.Bytes(), err
 }
 
 // WriteToFileSafe write content to filepath safely using golang mutex

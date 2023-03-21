@@ -1,35 +1,49 @@
 package watcher
 
 import (
+	"errors"
 	"fmt"
 	"log"
-	"os"
+	"prometheus-config-merger/pkg/config"
+	"prometheus-config-merger/pkg/http"
+	"prometheus-config-merger/pkg/merge"
+	"prometheus-config-merger/pkg/utils"
 
 	corev1 "k8s.io/api/core/v1"
 )
 
 func secretOnAdd(obj interface{}) {
 	// acquire mutex lock
-	M.Lock()
+	mut.Lock()
 
 	secret := obj.(*corev1.Secret)
 	wr, err := getWatchedResourceMapping("Secret", secret.Name, secret.Namespace)
 	if err != nil {
 		panic(err)
 	}
+
 	log.Printf("event [secretOnAdd] triggered for [%s/%s] \n", wr.Namespace, wr.Name)
 	log.Printf("syncing secret [%s/%s] to %s \n", wr.Namespace, wr.Name, wr.Path)
-	if err := syncResourceContentToLocalFile(secret.Data[wr.Key], wr.Path); err != nil {
+	if err := utils.SyncResourceContentToLocalFile(secret.Data[wr.Key], wr.Path); err != nil {
+		panic(err)
+	}
+
+	cfg := config.GetConfig()
+	content, err := merge.RunWithReturn(cfg)
+	if err != nil {
+		panic(err)
+	}
+	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
 		panic(err)
 	}
 
 	// release mutex lock
-	M.Unlock()
+	mut.Unlock()
 }
 
 func secretOnUpdate(oldObj interface{}, newObj interface{}) {
 	// acquire mutex lock
-	M.Lock()
+	mut.Lock()
 
 	secret := newObj.(*corev1.Secret)
 	wr, err := getWatchedResourceMapping("Secret", secret.Name, secret.Namespace)
@@ -38,12 +52,21 @@ func secretOnUpdate(oldObj interface{}, newObj interface{}) {
 	}
 	log.Printf("event [secretOnUpdate] triggered for [%s/%s] \n", wr.Namespace, wr.Name)
 	log.Printf("syncing secret [%s/%s] to %s \n", wr.Namespace, wr.Name, wr.Path)
-	if err := syncResourceContentToLocalFile(secret.Data[wr.Key], wr.Path); err != nil {
+	if err := utils.SyncResourceContentToLocalFile(secret.Data[wr.Key], wr.Path); err != nil {
+		panic(err)
+	}
+
+	cfg := config.GetConfig()
+	content, err := merge.RunWithReturn(cfg)
+	if err != nil {
+		panic(err)
+	}
+	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
 		panic(err)
 	}
 
 	// release mutex lock
-	M.Unlock()
+	mut.Unlock()
 }
 
 func secretOnDelete(obj interface{}) {
@@ -53,7 +76,7 @@ func secretOnDelete(obj interface{}) {
 
 func configmapOnAdd(obj interface{}) {
 	// acquire mutex lock
-	M.Lock()
+	mut.Lock()
 
 	configmap := obj.(*corev1.ConfigMap)
 	wr, err := getWatchedResourceMapping("ConfigMap", configmap.Name, configmap.Namespace)
@@ -62,17 +85,26 @@ func configmapOnAdd(obj interface{}) {
 	}
 	log.Printf("event [configmapOnAdd] triggered for [%s/%s] \n", wr.Namespace, wr.Name)
 	log.Printf("syncing configmap [%s/%s] to %s \n", wr.Namespace, wr.Name, wr.Path)
-	if err := syncResourceContentToLocalFile([]byte(configmap.Data[wr.Key]), wr.Path); err != nil {
+	if err := utils.SyncResourceContentToLocalFile([]byte(configmap.Data[wr.Key]), wr.Path); err != nil {
+		panic(err)
+	}
+
+	cfg := config.GetConfig()
+	content, err := merge.RunWithReturn(cfg)
+	if err != nil {
+		panic(err)
+	}
+	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
 		panic(err)
 	}
 
 	// release mutex lock
-	M.Unlock()
+	mut.Unlock()
 }
 
 func configmapOnUpdate(oldObj interface{}, newObj interface{}) {
 	// acquire mutex lock
-	M.Lock()
+	mut.Lock()
 
 	configmap := newObj.(*corev1.ConfigMap)
 	wr, err := getWatchedResourceMapping("ConfigMap", configmap.Name, configmap.Namespace)
@@ -81,12 +113,21 @@ func configmapOnUpdate(oldObj interface{}, newObj interface{}) {
 	}
 	log.Printf("event [configmapOnUpdate] triggered for [%s/%s] \n", wr.Namespace, wr.Name)
 	log.Printf("syncing configmap [%s/%s] to %s \n", wr.Namespace, wr.Name, wr.Path)
-	if err := syncResourceContentToLocalFile([]byte(configmap.Data[wr.Key]), wr.Path); err != nil {
+	if err := utils.SyncResourceContentToLocalFile([]byte(configmap.Data[wr.Key]), wr.Path); err != nil {
+		panic(err)
+	}
+
+	cfg := config.GetConfig()
+	content, err := merge.RunWithReturn(cfg)
+	if err != nil {
+		panic(err)
+	}
+	if err := syncToExternalService(string(content), cfg.TargetPrometheusConfig); err != nil {
 		panic(err)
 	}
 
 	// release mutex lock
-	M.Unlock()
+	mut.Unlock()
 }
 
 func configmapOnDelete(obj interface{}) {
@@ -105,16 +146,17 @@ func getWatchedResourceMapping(resourcetype string, secretName string, secretNam
 	return WatchedResource{}, fmt.Errorf("requested %s is not listed in watchedresource list", resourcetype)
 }
 
-func syncResourceContentToLocalFile(content []byte, filepath string) error {
-	log.Printf("overwriting file [%s] with new content \n", filepath)
-	file, err := os.Create(filepath)
+// syncToExternalService send final prometheus config payload to watcher
+func syncToExternalService(content string, filepath string) error {
+	res, err := http.PostWithBody(externalService, ResourceHTTPBodyPayload{
+		Content:  content,
+		Filepath: filepath,
+	})
 	if err != nil {
-		panic(err)
+		return err
 	}
-	defer file.Close()
-	_, err = file.Write(content)
-	if err != nil {
-		panic(err)
+	if res.StatusCode() != http.StatusOK {
+		return errors.New("failed sync payload to externalService")
 	}
 	return nil
 }

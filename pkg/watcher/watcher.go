@@ -8,7 +8,8 @@ import (
 	"k8s.io/client-go/kubernetes"
 )
 
-var M *sync.Mutex = &sync.Mutex{}
+var mut *sync.Mutex = &sync.Mutex{}
+var externalService string
 
 type Watcher struct {
 	incluster  bool
@@ -25,6 +26,11 @@ type WatchedResource struct {
 	Namespace string
 	Key       string
 	Path      string
+}
+
+type ResourceHTTPBodyPayload struct {
+	Content  string
+	Filepath string
 }
 
 var watchedResourceList []WatchedResource

@@ -29,6 +29,7 @@ type Config struct {
 	PrometheusEndpoint     string             `mapstructure:"prometheus_endpoint"`
 	PrometheusConfigs      []PrometheusConfig `mapstructure:"prometheus_configs"`
 	TargetPrometheusConfig string             `mapstructure:"target_prometheus_config"`
+	ServerListenExternal   string             `mapstructure:"server_listen_external"`
 	Debug                  bool
 }
 
@@ -53,6 +54,10 @@ func New() *Config {
 
 func GetConfig() *Config {
 	return localConfig
+}
+
+func GetServerListenExternal() string {
+	return localConfig.ServerListenExternal
 }
 
 // Validate run viper to parse config file and inject to Config struct

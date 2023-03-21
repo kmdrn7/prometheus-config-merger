@@ -17,6 +17,6 @@ Just in case you want to segregate prometheus configuration into multiple file, 
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		cfg := config.GetConfig()
-		merge.Run(cfg)
+		merge.RunWithReturn(cfg)
 	},
 }

@@ -52,4 +52,7 @@ func (w *Watcher) setupWatchedResources() {
 
 func (w *Watcher) setupConfig() {
 	w.cfg = config.GetConfig()
+
+	// configure external endpoint service
+	externalService = w.cfg.ServerListenExternal + "/-/inject-config"
 }

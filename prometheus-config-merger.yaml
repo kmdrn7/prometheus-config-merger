@@ -37,3 +37,5 @@ prometheus_endpoint: http://127.0.0.1:9090
 # define kubernetes specific configuration
 kubernetes:
   incluster: true
+
+server_listen_external: "http://localhost:5000"
